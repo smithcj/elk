@@ -1,0 +1,27 @@
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+req_extensions = req_ext
+distinguished_name = dn
+
+[ dn ]
+C=US
+ST=SC
+L=DNSOC2
+OU=Testing Domain
+emailAddress=admin@mcnis.com
+CN = es03
+
+[ req_ext ]
+subjectAltName = @alt_names
+extendedKeyUsage = serverAuth,clientAuth
+
+[ alt_names ]
+DNS.1 = elk
+DNS.2 = localhost
+DNS.3 = elk.mcnis.com
+DNS.4 = es01
+DNS.5 = es02
+DNS.6 = es03
+IP= 127.0.0.1

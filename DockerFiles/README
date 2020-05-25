@@ -1,0 +1,128 @@
+First build the required Elasicsearch custom images. 
+
+This step is required if you are using VMWare integrated containers (VIC).  VIC does not permit bind mounting of config files so you have to build any customizations in to the image.
+
+In our case we need to embed certficate files into the elasicsearch image and kibana. 
+
+IMPORTANT note on certificate generation.  Use the certificate template used for vCenter certificates (https://kb.vmware.com/s/article/2112009)
+
+To build the certificates edit the openssl.conf You will need to change the following:
+
+1. Common Name or CN
+2. DNS entries (it is a good idea to keep localhost and 127.0.0.1)
+
+Run the following SSL command to generate a new key and signing request
+
+openssl req -new -newkey rsa:2048 -nodes -out es.csr -keyout es.key  -config openssl.cnf
+
+es.key = Private Key
+es.csr = Certificate Signing Request 
+Once the certificate is signed open the PEM file and paste it's contents into the es.crt file.
+
+
+
+To build our custom image we will use the docker build command.  Docker build will pull down the stated image and allow you to do a varitiy of things.  If our case we are copying files and changing permissions
+
+Move to the Kibana directory
+
+docker build -t <repo url>/<project>/<name>:<version aka "tag"> . 
+
+
+The dot at the end depicts the name intructions are loacated in the current directory and will use the default filename of "Dockerfile"
+
+**Example**
+docker build -t docker.mcnis.com/default-project/kibana:1.0 .
+
+**Sample output**
+Sending build context to Docker daemon  3.825MB
+Step 1/9 : FROM docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+ ---> 7ec4f35ab452
+Step 2/9 : add --chown=elasticsearch:root ./es.crt /usr/share/elasticsearch/config/es.crt
+ ---> 5c480a6d4fd7
+Step 3/9 : add --chown=elasticsearch:root ./es.key /usr/share/elasticsearch/config/es.key
+ ---> 8a860ec97034
+Step 4/9 : add --chown=elasticsearch:root ./chain.crt /usr/share/elasticsearch/config/ca.crt
+ ---> 764fb616299c
+Step 5/9 : RUN chmod 644 /usr/share/elasticsearch/config/ca.crt
+ ---> Running in 40b17efeeae4
+Removing intermediate container 40b17efeeae4
+ ---> 9717b028c540
+Step 6/9 : add --chown=elasticsearch:root ./elastic-certificates.p12 /usr/share/elasticsearch/config/elastic-certificates.p12
+ ---> 00019fec4545
+Step 7/9 : RUN chmod 644 /usr/share/elasticsearch/config/es.crt
+ ---> Running in 6e178cdec5df
+Removing intermediate container 6e178cdec5df
+ ---> f6c580db46be
+Step 8/9 : RUN chmod 644 /usr/share/elasticsearch/config/es.key
+ ---> Running in c6df2cce9936
+Removing intermediate container c6df2cce9936
+ ---> 832c2b9d5237
+Step 9/9 : RUN chmod 644 /usr/share/elasticsearch/config/elastic-certificates.p12
+ ---> Running in 89228483818b
+Removing intermediate container 89228483818b
+ ---> 4637ef33c2f3
+Successfully built 4637ef33c2f3
+Successfully tagged docker.mcnis.com/default-project/elasticsearch:1.18
+
+Push the file to a private repo
+**Example**
+docker push docker.mcnis.com/default-kibana/kibana:1.0
+
+**Sample output**
+Sending build context to Docker daemon  3.825MB
+Step 1/9 : FROM docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+ ---> 7ec4f35ab452
+Step 2/9 : add --chown=elasticsearch:root ./es.crt /usr/share/elasticsearch/config/es.crt
+ ---> 5c480a6d4fd7
+Step 3/9 : add --chown=elasticsearch:root ./es.key /usr/share/elasticsearch/config/es.key
+ ---> 8a860ec97034
+Step 4/9 : add --chown=elasticsearch:root ./chain.crt /usr/share/elasticsearch/config/ca.crt
+ ---> 764fb616299c
+Step 5/9 : RUN chmod 644 /usr/share/elasticsearch/config/ca.crt
+ ---> Running in 40b17efeeae4
+Removing intermediate container 40b17efeeae4
+ ---> 9717b028c540
+Step 6/9 : add --chown=elasticsearch:root ./elastic-certificates.p12 /usr/share/elasticsearch/config/elastic-certificates.p12
+ ---> 00019fec4545
+Step 7/9 : RUN chmod 644 /usr/share/elasticsearch/config/es.crt
+ ---> Running in 6e178cdec5df
+Removing intermediate container 6e178cdec5df
+ ---> f6c580db46be
+Step 8/9 : RUN chmod 644 /usr/share/elasticsearch/config/es.key
+ ---> Running in c6df2cce9936
+Removing intermediate container c6df2cce9936
+ ---> 832c2b9d5237
+Step 9/9 : RUN chmod 644 /usr/share/elasticsearch/config/elastic-certificates.p12
+ ---> Running in 89228483818b
+Removing intermediate container 89228483818b
+ ---> 4637ef33c2f3
+
+
+Move to the elastic and logstash directory
+
+Same as before:
+Build the custom image and push it to the repo
+docker build -t <repo url>/<project>/<name>:<version aka "tag"> .
+docker push docker.mcnis.com/default-project/elasticsearch:1.18
+
+Now it is time to bring up the stack.
+
+You will have to edit the image: line in the config file to pull the image from your private repo.
+
+Move to the Model directory and run the following command
+
+vi docker-compose.yml
+<make changes>
+
+docker-compose up -d
+
+Once this process has complete you will need to set passwords for all of the builtin services.
+
+This is done with the following commands:
+docker --tls exec -it es01 bash
+cd bin
+elasticsearch-setup-passwords interactive -u https://localhost:9200
+
+
+If you are lucky it should build the stack
+

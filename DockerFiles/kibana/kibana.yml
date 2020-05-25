@@ -1,0 +1,15 @@
+#
+# ** THIS IS AN AUTO-GENERATED FILE **
+#
+
+# Default Kibana configuration for docker target
+server.name: kibana
+server.host: "0"
+elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+monitoring.ui.container.elasticsearch.enabled: true
+server.ssl.certificate: "/opt/kibana/config//kibana-server.crt"
+server.ssl.key: "/opt/kibana/config/kibana-server.key"
+server.ssl.enabled: true
+elasticsearch.ssl.certificateAuthorities: ["/opt/kibana/config/elasticsearch-ca.pem"]
+elasticsearch.username: kibana
+elasticsearch.password: Spawar12@!
