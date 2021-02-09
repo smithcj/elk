@@ -9,7 +9,7 @@ services:
       - discovery.seed_hosts=es02,es03
       - cluster.initial_master_nodes=es01,es02,es03
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms1512m -Xmx1512m"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.license.self_generated.type=trial 
       - xpack.security.enabled=true
       - xpack.security.http.ssl.enabled=true 
@@ -32,6 +32,69 @@ services:
     networks:
       - elastic
 
+  es02:
+    image: caseyjsmith/elastic
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=docker-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.license.self_generated.type=trial 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true 
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/es.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/es.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/es.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/es.key
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata2:/usr/share/elasticsearch/data
+    ports:
+      - 9201:9201
+    networks:
+      - elastic
+
+  es03:
+    image: caseyjsmith/elastic
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=docker-cluster
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.license.self_generated.type=trial 
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true 
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/es.key
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/ca.crt
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/es.crt
+      - xpack.security.transport.ssl.enabled=true 
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/es.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/es.key
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata3:/usr/share/elasticsearch/data
+    ports:
+      - 9202:9202
+    networks:
+      - elastic
     
   kib01:
     image: caseyjsmith/kibina
@@ -65,6 +128,8 @@ services:
       - elastic
     depends_on:
       - es01
+      - es02
+      - es03
       
   logstash-2:
     image: caseyjsmith/logstash
@@ -84,6 +149,8 @@ services:
       - elastic
     depends_on:
       - es01
+      - es02
+      - es03
 
 volumes:
   esdata1:
