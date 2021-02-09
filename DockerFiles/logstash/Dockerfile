@@ -1,5 +1,6 @@
-FROM docker.elastic.co/logstash/logstash:7.7.0
+FROM docker.elastic.co/logstash/logstash:7.10.1
 LABEL maintainer="Casey Smith"
+RUN logstash-plugin install logstash-filter-translate
 RUN rm -f /opt/logstash/pipeline/logstash.conf
 add --chown=logstash:root ./logstash.conf /opt/logstash/pipeline/logstash.conf
 add --chown=logstash:root  ./es.key /opt/logstash/config/es.key

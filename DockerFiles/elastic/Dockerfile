@@ -1,4 +1,4 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+FROM docker.elastic.co/elasticsearch/elasticsearch:7.10.1
 LABEL maintainer="Casey Smith"
 add --chown=elasticsearch:root ./es.crt /usr/share/elasticsearch/config/es.crt
 add --chown=elasticsearch:root ./es.key /usr/share/elasticsearch/config/es.key

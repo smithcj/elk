@@ -1,4 +1,4 @@
-FROM docker.elastic.co/kibana/kibana:7.7.0
+FROM docker.elastic.co/kibana/kibana:7.10.1
 LABEL maintainer="Casey Smith"
 RUN rm -f /opt/kibana/config/kibana.yml
 add --chown=kibana:root ./kibana.yml /opt/kibana/config/kibana.yml
