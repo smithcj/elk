@@ -112,7 +112,8 @@ services:
     image: caseyjsmith/logstash
     container_name: Log01
     ports:
-      - 5000:5000
+      - 8514:5000
+      - 8514:5000/udp
       - 5044:5044
       - 9600:9600
     environment:
@@ -132,10 +133,10 @@ services:
       - es03
       
   logstash-2:
-    image: caseyjsmith/logstash
+    image: caseyjsmith/logstash02
     container_name: Log02
     ports:
-      - 5001:5000/udp
+      - 514:5000/udp
       - 5045:5044
       - 9601:9600
     environment:
