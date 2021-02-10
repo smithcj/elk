@@ -112,8 +112,8 @@ services:
     image: caseyjsmith/logstash
     container_name: Log01
     ports:
-      - 8514:5000
-      - 8514:5000/udp
+      - 8514:8514
+      - 8514:8514/udp
       - 5044:5044
       - 9600:9600
     environment:
@@ -136,9 +136,9 @@ services:
     image: caseyjsmith/logstash02
     container_name: Log02
     ports:
-      - 514:5000/udp
-      - 5045:5044
-      - 9601:9600
+      - 514:5001/udp
+      - 5045:5045
+      - 9601:9601
     environment:
       - "LS_JAVA_OPTS=-Xms1g -Xmx1g"
       - "NODE_NAME=log02"
