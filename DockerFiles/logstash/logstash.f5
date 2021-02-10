@@ -11,21 +11,11 @@ input {
     type => "f5-access"
     port => 4444
   }
-  tcp {
-    type => "syslog"
-    port => 9514
-  }
-  udp {
-    type => "syslog"
-    port => 9514
-  }
-
 }
 
 filter {
 if [type] == "f5-access" {
     grok {
-      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message, %{GREEDYDATA:error}" }
       match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
       add_field => [ "received_at", "%{@timestamp}" ]
       add_field => [ "received_from", "%{host}" ]
@@ -34,19 +24,6 @@ if [type] == "f5-access" {
       match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
     }
   } # if
-
-if [type] == "syslog" {
-    grok {
-      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
-      add_field => [ "received_at", "%{@timestamp}" ]
-      add_field => [ "received_from", "%{host}" ]
-    }
-    date {
-      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
-    }
-  } # if
-
-
 } # filter
 
 output {
@@ -55,7 +32,7 @@ output {
       ssl             => true
       cacert          => "/opt/logstash/config/chain.crt"
      # manage_template => false
-      index           => "logstash01-%{+YYYY.MM.dd}"
+     # index           => "network-%{+YYYY.MM.dd}"
      # document_type   => "%{type}"
      # document_id     => "%{fingerprint}"
       user            => "elastic"

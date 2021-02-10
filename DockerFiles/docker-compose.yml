@@ -109,11 +109,14 @@ services:
       - elastic
  
   logstash-1:
-    image: caseyjsmith/logstash
+    image: caseyjsmith/logstash02
     container_name: Log01
     ports:
-      - 8514:8514
-      - 8514:8514/udp
+     # - 8514:8514
+      - 4444:4444
+      - 4444:4444/udp
+      - 514:9514/udp
+      - 514:9514
       - 5044:5044
       - 9600:9600
     environment:
@@ -133,10 +136,13 @@ services:
       - es03
       
   logstash-2:
-    image: caseyjsmith/logstash02
+    image: caseyjsmith/logstash
     container_name: Log02
     ports:
-      - 514:5001/udp
+    #  - 4444:4444
+    #  - 4444:4444/udp
+      - 8514:8514
+      - 8514:8514/udp
       - 5045:5045
       - 9601:9601
     environment:
@@ -152,7 +158,7 @@ services:
       - es01
       - es02
       - es03
-
+#
 volumes:
   esdata1:
 
