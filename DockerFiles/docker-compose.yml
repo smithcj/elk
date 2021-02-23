@@ -158,6 +158,17 @@ services:
       - es01
       - es02
       - es03
+
+
+  filebeat:
+    image: caseyjsmith/filebeat
+    container_name: filebeat
+    ports:
+      - 2055:2055/udp
+    networks:
+      - elastic
+    depends_on:
+      - es01
 #
 volumes:
   esdata1:

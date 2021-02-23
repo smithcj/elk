@@ -1,0 +1,35 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+setup.dashboards.enabled: true
+setup.template.enabled: true
+setup.template.overwrite: true
+
+filebeat.config.inputs:
+  enabled: true
+  path: configs.d/*.yml
+  reload.enabled: true
+  reload.period: 10s
+
+filebeat.inputs:
+- type: netflow
+  max_message_size: 10KiB
+#  host: "0.0.0.0:2055"
+  protocols: [ v5, v9, ipfix ]
+  expiration_timeout: 30m
+  queue_size: 8192
+
+setup.kibana:
+  host: "kib01:5601"
+  protocol: "https"
+  ssl.enabled: true
+  ssl.certificate_authorities: ["/ca.pem"]
+
+output.elasticsearch:
+  hosts: '${ELASTICSEARCH_HOSTS:https://es01:9200}'
+  username: '${ELASTICSEARCH_USERNAME:elastic}'
+  password: '${ELASTICSEARCH_PASSWORD:Spawar12@!}'
+  ssl.certificate_authorities: ["/ca.pem"]
+
